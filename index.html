@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>redBus Open Ticket Prototype</title>
+<style>
+:root{--r:#e8202f;--rl:#fdecee;--ink:#14173a;--g:#6b7080;--ln:#e6e8ee;--grn:#1a9e4b;--bl:#1565e8}
+*{box-sizing:border-box;margin:0;font-family:Roboto,Segoe UI,Arial,sans-serif}
+html,body{height:100%}
+body{background:#eceef3;display:flex;align-items:center;justify-content:center}
+#ph{width:390px;height:810px;max-height:96vh;background:#fff;border-radius:44px;border:10px solid #111;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px #0004}
+@media(max-width:500px){body{background:#fff}#ph{width:100%;height:100%;max-height:none;border:0;border-radius:0}}
+.sb{background:var(--r);color:#fff;font-size:13px;font-weight:600;padding:8px 22px 0;display:flex;justify-content:space-between}
+.hd{background:var(--r);color:#fff;padding:8px 16px 16px;display:flex;align-items:center;gap:12px}
+.hd b{font-size:18px;display:block}.hd small{font-size:13px;opacity:.95}
+.back{font-size:22px;cursor:pointer;background:none;border:0;color:#fff}
+.logo{margin-left:auto;border:2px solid #fff;border-radius:8px;padding:2px 7px;font-weight:700;font-size:13px}
+#body{flex:1;overflow-y:auto;background:#fff;border-radius:18px 18px 0 0;margin-top:-10px;padding:12px;position:relative}
+.ft{padding:10px 12px 14px;border-top:1px solid var(--ln);background:#fff}
+.btn{width:100%;border:0;background:var(--r);color:#fff;font-weight:700;font-size:16px;padding:14px;border-radius:10px;cursor:pointer}
+.btn:disabled{background:#f2a2a8;cursor:not-allowed}
+.btn.o{background:#fff;color:var(--r);border:1.5px solid var(--r)}
+.lnk{color:var(--bl);text-align:center;font-size:14px;padding:10px;cursor:pointer}
+.card{border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.pink{background:var(--rl);border-color:#f6c4c9}.blue{background:#eef4ff;border-color:#cfe0ff}
+.row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}
+.g{color:var(--g);font-size:13px}.h{font-weight:700;color:var(--ink)}
+.chip{padding:7px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13px;white-space:nowrap}
+.chip.on{background:var(--r);color:#fff;border-color:var(--r)}
+.fld{border:1px solid var(--ln);border-radius:10px;padding:8px 12px;margin-bottom:10px}
+.fld label{font-size:13px;color:var(--g);display:block}.fld input{border:0;outline:0;width:100%;font-size:15px;padding:3px 0}
+.inp{display:flex;flex-direction:column;gap:2px}
+.opt{border:2px solid var(--ln);border-radius:12px;padding:10px;cursor:pointer;flex:1}
+.opt.sel.n{border-color:var(--bl);background:#eef4ff}.opt.sel.o{border-color:var(--r);background:var(--rl)}
+.opt li{list-style:none;font-size:12px;margin:8px 0;color:var(--g)}.opt li b{display:block;color:var(--ink);font-size:13px}
+.bus{display:flex;gap:10px;border-bottom:1px solid var(--ln);padding:12px 0;cursor:pointer}
+.lg{width:54px;height:54px;border-radius:8px;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc{border-radius:8px;padding:8px 12px;text-align:center;font-weight:700;margin-top:6px}
+.sc small{display:block;font-weight:400}
+.hi{background:#e3f6ea;color:#14803c}.md{background:#fff3d1;color:#a66a00}.lo{background:#fde3e5;color:#d42a37}
+.tog{width:44px;height:26px;border-radius:13px;background:#ccc;position:relative;cursor:pointer;flex-shrink:0}
+.tog.on{background:var(--r)}.tog i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}.tog.on i{left:21px}
+.seats{display:grid;grid-template-columns:28px 38px 38px 20px 38px;gap:8px 8px;justify-content:center;background:#f4f5f8;border-radius:14px;padding:14px}
+.s{height:34px;border:1.5px solid #b9bdc8;border-radius:7px;background:#fff;cursor:pointer}
+.s.b{background:#c9ccd4;cursor:not-allowed}.s.sel{background:var(--r);border-color:var(--r)}
+.rn{font-size:12px;color:var(--g);display:flex;align-items:center}
+.pay{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln);cursor:pointer}
+.rad{width:20px;height:20px;border:2px solid #aaa;border-radius:50%}.rad.on{border:6px solid var(--r)}
+.ok{width:66px;height:66px;border-radius:50%;background:var(--grn);color:#fff;font-size:38px;display:flex;align-items:center;justify-content:center;margin:6px auto}
+.nav{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:8px;border-top:1px solid var(--ln);background:#fff;font-size:12px;color:var(--g)}
+.tag{background:#e3f6ea;color:#14803c;font-size:12px;padding:3px 8px;border-radius:6px}
+#toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;transition:.3s;pointer-events:none}
+</style></head><body>
+<div id="ph"><div class="sb"><span>9:41</span><span>●●● ▮</span></div><div id="app" style="display:contents"></div><div id="toast"></div></div>
+<script>
+const BUSES=[
+{n:"Neeta Tours and Travels",l:"Neeta",c:"#e8202f",d:"07:15",a:"11:27",t:"4h 12m",v:"Via Lonavala",ty:"Bharat Benz AC Seater (2+1)",r:"4.0 (363)",s:12,p:91,st:"On Time"},
+{n:"Orange Tours And Travels",l:"orange",c:"#f58a1f",d:"08:00",a:"12:30",t:"4h 30m",v:"Via Lonavala",ty:"AC Sleeper (2+1)",r:"4.1 (512)",s:8,p:78,st:"On Time"},
+{n:"Purple Travels",l:"PURPLE",c:"#6a2c9c",d:"09:30",a:"14:00",t:"4h 30m",v:"Via Expressway",ty:"AC Seater (2+1)",r:"3.9 (268)",s:5,p:63,st:"Running On Time"},
+{n:"VRL Travels",l:"VRL",c:"#f2c200",d:"10:00",a:"14:20",t:"4h 20m",v:"Via Lonavala",ty:"AC Sleeper (2+1)",r:"4.2 (418)",s:2,p:28,st:"On Time"},
+{n:"SRS Travels",l:"SRS",c:"#1565c0",d:"11:15",a:"15:50",t:"4h 35m",v:"Via Lonavala",ty:"AC Seater (2+1)",r:"3.8 (138)",s:14,p:52,st:"On Time"}];
+const BOOKED=["2A","2B","5A","5C","6A","6B","7A","7C"];
+let S={scr:"home",hist:[],mode:"normal",bus:null,seat:null,addon:false,name:"",pay:"UPI",from:"",pnr:"RBOT123456"};
+const $=id=>document.getElementById(id);
+const price=()=>349+(S.addon&&S.mode==="normal"?100:0);
+function go(s,back){if(!back)S.hist.push(S.scr);S.scr=s;render()}
+function bk(){const p=S.hist.pop();if(p){S.scr=p;render()}}
+function toast(m){const t=$("toast");t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,1800)}
+const hd=(t,sub)=>`<div class="hd"><button class="back" onclick="bk()">←</button><div><b>${t}</b>${sub?`<small>${sub}</small>`:""}</div><span class="logo">redBus</span></div>`;
+const sc=p=>p>=75?"hi":p>=50?"md":"lo";
+function busRow(b,i,fn,showChance){return `<div class="bus" onclick="${fn}(${i})"><div class="lg" style="background:${b.c};${b.l=="VRL"?"color:#222":""}">${b.l}</div><div style="flex:1"><div class="h">${b.n}</div><div class="h" style="font-size:16px;margin:2px 0">${b.d} → ${b.a}</div><div class="g">${b.t} | ${b.v}</div><div class="g">${b.ty}</div><div class="g">🕐 ${b.st}</div></div><div style="text-align:right"><div class="g">★ ${b.r}</div><div class="g">${b.s} seats available</div>${showChance?`<div class="sc ${sc(b.p)}">${b.p}%<small>seat chance</small></div>`:`<div class="h" style="margin-top:8px">₹349</div>`}</div></div>`}
+function seatMap(){let h='<div class="seats"><div></div><div class="rn" style="justify-content:center">A</div><div class="rn" style="justify-content:center">B</div><div></div><div class="rn" style="justify-content:center">C</div>';
+for(let r=1;r<=9;r++){h+=`<div class="rn">${r}</div>`;["A","B"].forEach(c=>h+=cell(r+c));h+="<div></div>";h+=cell(r+"C")}return h+"</div>"}
+function cell(id){const b=BOOKED.includes(id);return `<div class="s ${b?"b":""} ${S.seat===id?"sel":""}" ${b?"":`onclick="pick('${id}')"`}></div>`}
+function pick(id){S.seat=id;render()}
+function selBus(i){S.bus=BUSES[i];S.seat=null;go("seats")}
+function trackBus(i){S.bus=BUSES[i];S.seat=null;go("tseat")}
+function mode(m){S.mode=m;render()}
+const F={
+home:()=>`<div class="hd" style="padding-top:14px"><span class="logo" style="margin:0;font-size:18px">redBus</span><span style="margin-left:auto;font-size:13px">Offers &nbsp; Help &nbsp; Account</span></div>
+<div id="body"><div class="row" style="justify-content:space-around;margin:4px 0 10px"><b style="color:var(--r);border-bottom:3px solid var(--r);padding-bottom:6px">Bus Tickets</b><span class="g">Cab Rental</span><span class="g">Train Tickets</span></div>
+<div class="card"><div class="g">From</div><div class="h" style="font-size:18px;margin-bottom:8px">Pune</div><hr style="border:0;border-top:1px solid var(--ln)"><div class="g" style="margin-top:8px">To</div><div class="h" style="font-size:18px">Mumbai</div><hr style="border:0;border-top:1px solid var(--ln);margin:8px 0"><div class="row sp"><div><div class="g">Journey Date</div><div class="h" style="font-size:18px">Sun, 27 Nov</div></div><span style="color:var(--bl)">Today &nbsp; Tomorrow</span></div><button class="btn" style="margin-top:12px" onclick="go('choose')">SEARCH BUSES</button></div>
+<div class="card pink" style="background:linear-gradient(90deg,#fdecee,#f9c9ce)"><div style="font-size:20px;font-weight:700;color:var(--ink)">Save up to ₹250</div><div class="h">on bus tickets</div><div class="g">Use code: <b style="color:var(--r);border:1.5px dashed var(--r);padding:2px 8px;border-radius:6px">FIRST</b></div></div>
+<div class="row sp"><b class="h">Explore Offers</b><span style="color:var(--bl);font-size:13px">VIEW ALL</span></div>
+<div class="row" style="margin-top:8px"><div class="card pink" style="flex:1;font-size:13px">🚌 Open Ticket<br><span class="g">Board any bus</span></div><div class="card" style="flex:1;font-size:13px">🎟️ Return trip<br><span class="g">12.5% off</span></div></div>
+<div style="height:50px"></div></div><div class="nav"><b style="color:var(--r)">⌂ Home</b><span>My Bookings</span><span>Help</span><span>My Account</span></div>`,
+
+choose:()=>{const o=S.mode==="open";return hd("Pune → Mumbai","Sun, 27 Nov")+`<div id="body"><div class="card pink"><div style="font-size:22px;font-weight:700;color:var(--ink)">Same price.<br>Two ways to travel.</div><div class="g">Choose what's more convenient for you.</div></div>
+<div class="row" style="align-items:stretch"><div class="opt n ${o?"":"sel"}" onclick="mode('normal')"><div class="row"><div class="rad ${o?"":"on"}"></div><b class="h">Normal Ticket</b></div><ul><li><b>Fixed bus & seat</b>Travel on the bus you select</li><li><b>Fixed time</b>Board at the scheduled time</li><li><b>Regular ticket</b>No extra charges</li></ul></div>
+<div class="opt o ${o?"sel":""}" onclick="mode('open')"><div class="row"><div class="rad ${o?"on":""}"></div><b style="color:var(--r)">Open Ticket</b></div><ul><li><b>Any bus, any seat</b>Board any available redBus on this route</li><li><b>Flexible timing</b>Travel up to 12 hours on the same day</li><li><b>Automatic refund</b>No cancellation charges</li><li><b>Live bus tracking</b>See nearby buses in real-time</li></ul></div></div>
+<div class="row sp" style="margin:10px 0 6px"><b class="h">Buses available for Open Ticket</b><span style="color:var(--grn);font-size:12px">● 320+ running today</span></div>
+<div class="row" style="overflow:auto"><span class="chip on">All (320+)</span><span class="chip">6AM-12PM</span><span class="chip">12PM-6PM</span><span class="chip">6PM-12AM</span></div>
+<div class="row" style="margin-top:8px">${["Neeta Bus|15-30","PMPML|20-40","Purple|30-60"].map(x=>{const[a,b]=x.split("|");return `<div class="card" style="flex:1;font-size:12px"><b>${a}</b><br><span style="color:var(--grn)">● Seats available</span><br><span class="g">Every ${b} min</span></div>`}).join("")}</div></div>
+<div class="ft"><button class="btn" onclick="S.addon=false;go(S.mode==='open'?'pax':'buses')">${o?"Continue with Open Ticket →":"Continue with Normal Ticket →"}</button><div class="lnk" onclick="mode(S.mode==='open'?'normal':'open')">${o?"Continue with Normal Tickets":"Switch to Open Ticket"}</div></div>`},
+
+buses:()=>hd("Available Buses","Pune → Mumbai | Sun, 27 Nov")+`<div id="body"><div class="row" style="overflow:auto;margin-bottom:6px"><span class="chip on">All (320)</span><span class="chip">AC</span><span class="chip">Sleeper</span><span class="chip">Seater</span></div>${BUSES.map((b,i)=>busRow(b,i,"selBus",false)).join("")}</div>`,
+
+seats:()=>hd("Select Your Seat",S.bus.n)+`<div id="body"><div class="card"><div class="h">${S.bus.d} → ${S.bus.a}</div><div class="g">${S.bus.ty} · Boarding: Hinjewadi, Pune</div></div>${seatMap()}<div class="row" style="justify-content:center;margin-top:10px" ><span class="g">▢ Available</span><span class="g" style="color:var(--r)">■ Selected</span><span class="g">■ Booked</span></div></div><div class="ft"><div class="row sp" style="margin-bottom:8px"><span class="g">${S.seat?"Seat "+S.seat:"Pick a seat"}</span><b class="h">₹349</b></div><button class="btn" ${S.seat?"":"disabled"} onclick="go('pax')">Continue to Passenger Details →</button></div>`,
+
+pax:()=>{const o=S.mode==="open"||S.addon;return hd("Passenger Details",S.mode==="open"?"Open Ticket: Pune → Mumbai":"Pune → Mumbai")+`<div id="body"><div class="card row sp"><div><div class="g">Journey Date & Price</div><div class="h" style="font-size:17px">Sun, 27 Nov</div></div><div style="text-align:right"><b class="h">₹${price()} / Person</b><div class="g">${S.mode==="open"?"Open Ticket":"Normal Ticket"}</div></div></div>
+<div class="card"><b class="h">Add Passenger Details</b><div class="g" style="margin:2px 0 10px">1 traveller (You)</div>
+<div class="fld"><label>Name</label><input id="nm" placeholder="Enter your name" value="${S.name}" oninput="S.name=this.value"></div>
+<div class="fld"><label>Email ID</label><input placeholder="Enter your email ID"></div>
+<div class="fld"><label>Phone Number</label><input placeholder="+91 Enter your phone number"></div>
+<div class="row g">✅ Send booking details and updates on WhatsApp</div></div>
+${S.mode==="normal"?`<div class="card pink"><div class="row sp"><div><b class="h">Add Open Ticket option</b> <span class="tag" style="background:#fde3e5;color:var(--r)">MOST FLEXIBLE</span><div class="g">Convert to Open Ticket by paying ₹100 (up to 1 hour before departure)</div></div><div class="tog ${S.addon?"on":""}" onclick="S.addon=!S.addon;render()"><i></i></div></div><div class="row sp g" style="margin-top:8px;font-size:12px"><span>🚌 Board any bus</span><span>🕐 Flexible timing</span><span>📍 Live tracking</span></div></div>`
+:`<div class="card pink"><b class="h">Open Ticket included</b> <span class="tag">ACTIVE</span><div class="g">Board any eligible bus 6:00 AM – 11:59 PM. Automatic refund if unused.</div></div>`}
+<div class="card row"><span>🛡️</span><b class="h" style="font-size:14px">Mandatory Travel Guidelines</b></div>
+<div class="g" style="padding:0 4px">Pune → Mumbai (320 buses) · Valid today, 6:00 AM – 11:59 PM</div></div>
+<div class="ft"><button class="btn" onclick="go('pay')">CONTINUE TO PAYMENT →</button></div>`},
+
+pay:()=>hd("Payment Details","🔒 Secure Payment")+`<div id="body"><div class="card"><div class="g">Order Summary</div><div class="row sp"><b class="h">Pune → Mumbai (${S.mode==="open"||S.addon?"Open Ticket":"Normal"})</b><b style="font-size:20px">₹${price()}</b></div><div class="g">Sun, 27 Nov | 1 Traveller${S.bus&&S.mode==="normal"?` | Seat ${S.seat}`:""}</div></div>
+<div class="card row"><input placeholder="Enter Coupon Code" style="flex:1;border:1px solid var(--ln);border-radius:8px;padding:10px"><button class="chip" style="background:#f2f3f6" onclick="toast('Demo: coupons disabled')">Apply</button></div>
+<div class="card"><b class="h">Payment Options</b>${[["UPI","UPI (Recommended)","PhonePe · GPay · Paytm · BHIM"],["CC","Credit Card","Visa, Mastercard, Rupay"],["DC","Debit Card","All major banks"],["NB","Net Banking","All major banks"],["W","Wallets","Paytm, Amazon Pay, Mobikwik"]].map(x=>`<div class="pay" onclick="S.pay='${x[0]}';render()"><div class="rad ${S.pay===x[0]?"on":""}"></div><div><b class="h">${x[1]}</b><div class="g">${x[2]}</div></div></div>`).join("")}</div>
+<div class="g" style="text-align:center">🛡️ 100% Secure Payments (prototype: no real charge)</div></div>
+<div class="ft"><button class="btn" onclick="S.hist=[];S.scr='done';render()">PAY ₹${price()}</button></div>`,
+
+done:()=>{const o=S.mode==="open"||S.addon;return hd("Booking Confirmed!",(o?"Open Ticket · ":"")+"Pune → Mumbai")+`<div id="body"><div class="card pink" style="text-align:center"><div class="ok">✓</div><b class="h" style="font-size:19px">Your ${o?"Open Ticket":"Ticket"} is Confirmed!</b><div class="g" style="margin:4px 0">${o?"Board any eligible bus between 6:00 AM – 11:59 PM on Sun, 27 Nov":`${S.bus?S.bus.n+" · "+S.bus.d+" · Seat "+S.seat:""}`}</div><div class="h">PNR: ${S.pnr}</div></div>
+<div class="card row sp"><div><div class="h">👤 1 Traveller</div><div class="g">${S.name||"Prakhar Agrawal"}</div></div><div><div class="g">Paid Amount</div><b class="h">₹${price()}</b></div></div>
+${o?`<div class="card pink"><b class="h">What's next?</b><div class="row sp g" style="margin-top:8px;font-size:12px;text-align:center"><span>🚌<br>Board any<br>available bus</span><span>🕐<br>Flexible<br>6AM–11:59PM</span><span>▦<br>Show QR<br>at boarding</span><span>🛡️<br>Auto refund<br>if unused</span></div></div>
+<div class="card blue"><b class="h">Track Available Buses</b><div class="g">See nearby buses, live ETAs and seat availability on your route.</div><button class="btn" style="margin-top:10px" onclick="S.from='done';go('track')">Track Buses Now →</button></div>`
+:`<div class="card blue"><b class="h">Might miss your bus?</b><div class="g">Convert to Open Ticket for ₹100, up to 1 hour before departure.</div><button class="btn" style="margin-top:10px" onclick="S.mode='open';S.addon=false;toast('Converted to Open Ticket (+₹100)');S.scr='done';render()">Convert to Open Ticket · ₹100</button></div>`}
+<div class="card row"><span>💬</span><div><b class="h">Get updates on WhatsApp</b><div class="g">Real-time bus updates, boarding info and more.</div></div></div>
+<button class="btn o" onclick="restart()">Back to Home</button></div>`},
+
+track:()=>hd("Available Buses on Your Route","Pune → Mumbai | Sun, 27 Nov")+`<div id="body"><div class="card pink row sp"><div><b class="h">You have an Open Ticket</b><div class="g">Board any eligible bus 6:00 AM – 11:59 PM</div></div></div>
+<div class="card blue g" style="font-size:12px">Seat chance shows the likelihood of getting a seat with your open ticket based on live seat availability, historical trends and expected demand. It is an estimate, never a guarantee.</div>
+${BUSES.map((b,i)=>busRow(b,i,"trackBus",true)).join("")}<div class="card row" style="margin-top:10px"><span>📍</span><div><b style="color:var(--r)">View buses on map</b><div class="g">See live bus locations and ETAs</div></div></div></div>`,
+
+tseat:()=>hd("Select Your Bus & Seat","Use your Open Ticket · Pune → Mumbai")+`<div id="body"><div class="card pink"><b class="h">Open Ticket</b> <span class="tag">Active</span><div class="g">Valid till today, 11:59 PM · PNR: ${S.pnr}</div></div>
+<div class="card row"><div class="lg" style="background:${S.bus.c}">${S.bus.l}</div><div><b class="h">${S.bus.n}</b><div class="h">${S.bus.d} → ${S.bus.a} (${S.bus.t})</div><div class="g">${S.bus.ty}</div></div></div>
+${seatMap()}<div class="card" style="margin-top:10px"><div class="row sp"><div><div class="g">Selected Seat</div><b style="font-size:22px">${S.seat||"—"}</b></div><b style="font-size:20px">₹0</b></div><div class="g">No extra charge</div></div>
+<div class="card blue g">You can board this bus using your Open Ticket. Show the QR code at boarding.</div>
+<div class="g" style="padding:0 4px">📍 Boarding: Hinjewadi, Pune · 🕐 Departs ${S.bus.d} (${S.bus.st}) · ETA ${S.bus.a}</div></div>
+<div class="ft row"><button class="btn o" style="width:38%" onclick="bk()">Change Bus</button><button class="btn" ${S.seat?"":"disabled"} onclick="go('frozen')">Confirm Seat ${S.seat||""} →</button></div>`,
+
+frozen:()=>hd("Seat Frozen!","Open Ticket · Pune → Mumbai")+`<div id="body"><div class="card pink" style="text-align:center"><div class="ok">✓</div><b class="h" style="font-size:19px">Seat ${S.seat} locked on ${S.bus.n}</b><div class="g">${S.bus.d} → ${S.bus.a} · Boarding Hinjewadi, Pune</div></div>
+<div class="card" style="text-align:center"><div class="g">Show this QR at boarding</div><div style="font-size:90px;line-height:1.1">▦</div><b class="h">PNR: ${S.pnr}</b></div>
+<button class="btn" onclick="go('track')">Track Another Bus</button><div style="height:8px"></div><button class="btn o" onclick="restart()">Restart Demo</button></div>`
+};
+function restart(){S={scr:"home",hist:[],mode:"normal",bus:null,seat:null,addon:false,name:"",pay:"UPI",from:"",pnr:"RBOT123456"};render()}
+let LS="";function render(){const b=document.getElementById("body"),y=b&&LS===S.scr?b.scrollTop:0;LS=S.scr;$("app").innerHTML=F[S.scr]();const n=document.getElementById("body");if(n)n.scrollTop=y}
+render();
+</script></body></html>
